@@ -13,3 +13,7 @@ scrape.py
 creds.json
 venv
 *.zip
+
+
+
+.env
