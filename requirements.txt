@@ -2,3 +2,9 @@ app_version==1.0.0
 selenium
 requests
 lxml
+flask-swagger-ui
+flask
+apispec
+apispec-webframeworks
+flask-apispec
+marshmallow
