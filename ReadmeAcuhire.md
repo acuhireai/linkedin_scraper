@@ -10,14 +10,18 @@ venv\Scripts\activate
 
 
 # Step 2: Install Dependencies
+
+
 pip install -r requirements.txt
 
 
 # Step 3: Set Environment Variables
 .env
 
-uild and Run Instructions
-Build the Docker Image:
+
+## Build the Docker Image:
+docker build -t flask-linkedin-app .
+docker run -p 8080:8080 flask-linkedin-app
 
 bash
 Copy code

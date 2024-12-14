@@ -8,3 +8,4 @@ apispec
 apispec-webframeworks
 flask-apispec
 marshmallow
+python-dotenv
