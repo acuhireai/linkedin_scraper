@@ -34,25 +34,49 @@ actions.login(driver, email, password, timeout=100)
 @ app.route('/person', methods=['GET'])
 def get_person():
 
-    profile_url = request.args.get('url')
-    if not profile_url:
-        return jsonify({"message": "Profile URL is required"}), 400
+    profile_url = request.args.get('profileUrl')
+    company_url = request.args.get('companyUrl')
+    if profile_url and profile_url.strip() != "":
+        try:
+            person = Person(profile_url, driver=driver,
+                            close_on_complete=False)
+            return jsonify({
+                "name": person.name,
+                "linkedin_url": person.linkedin_url,
+                "about": person.about,
+                "experiences": person.experiences,
+                "interests": person.interests,
+                "accomplishments": person.accomplishments,
+                "also_viewed_urls": person.also_viewed_urls,
+                "contacts": person.contacts,
+            }), 200
 
-    try:
-        person = Person(profile_url, driver=driver, close_on_complete=False)
-        return jsonify({
-            "name": person.name,
-            "linkedin_url": person.linkedin_url,
-            "about": person.about,
-            "experiences": person.experiences,
-            "interests": person.interests,
-            "accomplishments": person.accomplishments,
-            "also_viewed_urls": person.also_viewed_urls,
-            "contacts": person.contacts,
-        }), 200
+        except Exception as e:
+            return jsonify({"message": str(e)}), 500
+    if company_url and company_url.strip() != "":
+        try:
+            company = Company(company_url,
+                              driver=driver, close_on_complete=False, get_employees=True)
+            
+            return jsonify({
+                "name": company.name,
+                # "linkedin_url": company_url,
+                # "about_us": company.about_us,
+                # "website": company.website,
+                # "phone": company.phone,
+                # "headquarters": company.headquarters,
+                # "founded": company.founded,
+                # "industry": company.industry,
+                # "company_type": company.company_type,
+                # "specialties": company.specialties,
+                # "showcase_pages": company.showcase_pages,
+                # "company_size": company.company_size,
+                # "affiliated_companies": company.affiliated_companies,
+                # "employees": company.employees,
+                "headcount": company.headcount}), 200
 
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
+        except Exception as e:
+            return jsonify({"message": str(e)}), 500
 
 
 # Serve the app
