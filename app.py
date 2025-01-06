@@ -4,6 +4,9 @@ from flask_apispec import FlaskApiSpec, doc, use_kwargs
 from marshmallow import Schema, fields
 from linkedin_scraper import Person, Company, Job, JobSearch, actions
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+
 import os
 from dotenv import load_dotenv
 
@@ -13,6 +16,7 @@ load_dotenv()
 # Setup Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default_secret_key")
+
 
 # Selenium WebDriver setup
 driver = webdriver.Chrome()
@@ -34,6 +38,12 @@ docs = FlaskApiSpec(app)
 class LoginSchema(Schema):
     email = fields.String(required=True, description="LinkedIn email")
     password = fields.String(required=True, description="LinkedIn password")
+
+
+print(Person("https://www.linkedin.com/in/jojojoseph/",
+             driver=driver, close_on_complete=False))
+# print(Company("https://ca.linkedin.com/company/google",
+#       driver=driver, close_on_complete=False))
 
 
 @app.route('/login', methods=['POST'])
