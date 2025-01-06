@@ -22,55 +22,17 @@ app.secret_key = os.getenv("SECRET_KEY", "default_secret_key")
 driver = webdriver.Chrome()
 email = os.getenv("LINKEDIN_USER")
 password = os.getenv("LINKEDIN_PASSWORD")
-actions.login(driver, email, password)
-
-# Swagger UI setup
-SWAGGER_URL = '/swagger'
-swaggerui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, '/swagger.json')
-app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
-
-# Flask-APISpec setup
-docs = FlaskApiSpec(app)
-
-# Schema definitions
+actions.login(driver, email, password, timeout=100)
 
 
-class LoginSchema(Schema):
-    email = fields.String(required=True, description="LinkedIn email")
-    password = fields.String(required=True, description="LinkedIn password")
-
-
-print(Person("https://www.linkedin.com/in/jojojoseph/",
-             driver=driver, close_on_complete=False))
+# print(Person("https://www.linkedin.com/in/jojojoseph/",
+#       driver=driver,   close_on_complete=False, time_to_wait_after_login=2000))
 # print(Company("https://ca.linkedin.com/company/google",
-#       driver=driver, close_on_complete=False))
+#               driver=driver, close_on_complete=False))
 
 
-@app.route('/login', methods=['POST'])
-@doc(description="Login the user and set session.", tags=["Authentication"])
-@use_kwargs(LoginSchema, location="json")
-def login(email, password):
-    if 'user_logged_in' in session:
-        return jsonify({"message": "Already logged in"}), 200
-
-    if email == os.getenv("LINKEDIN_USER") and password == os.getenv("LINKEDIN_PASSWORD"):
-        session['user_logged_in'] = True
-        return jsonify({"message": "Login successful"}), 200
-    return jsonify({"message": "Invalid credentials"}), 401
-
-
-@app.route('/logout', methods=['POST'])
-@doc(description="Logout the user and clear session.", tags=["Authentication"])
-def logout():
-    session.pop('user_logged_in', None)
-    return jsonify({"message": "Logged out successfully"}), 200
-
-
-@app.route('/person', methods=['GET'])
-@doc(description="Fetch LinkedIn person details.", tags=["LinkedIn Data"])
+@ app.route('/person', methods=['GET'])
 def get_person():
-    if 'user_logged_in' not in session:
-        return jsonify({"message": "Unauthorized"}), 401
 
     profile_url = request.args.get('url')
     if not profile_url:
@@ -80,18 +42,18 @@ def get_person():
         person = Person(profile_url, driver=driver, close_on_complete=False)
         return jsonify({
             "name": person.name,
-            "job_title": person.job_title,
-            "company": person.company,
-            "education": person.education
+            "linkedin_url": person.linkedin_url,
+            "about": person.about,
+            "experiences": person.experiences,
+            "interests": person.interests,
+            "accomplishments": person.accomplishments,
+            "also_viewed_urls": person.also_viewed_urls,
+            "contacts": person.contacts,
         }), 200
+
     except Exception as e:
         return jsonify({"message": str(e)}), 500
 
-
-# Register routes with Flask-APISpec
-docs.register(login)
-docs.register(logout)
-docs.register(get_person)
 
 # Serve the app
 if __name__ == '__main__':

@@ -9,3 +9,4 @@ apispec-webframeworks
 flask-apispec
 marshmallow
 python-dotenv
+beautifulsoup4
